@@ -1,3 +1,4 @@
+//go:build !pkcs11
 // +build !pkcs11
 
 /*
@@ -20,6 +21,7 @@ package factory
 import (
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 // FactoryOpts holds configuration information used to initialize factory implementations
@@ -53,7 +55,14 @@ func InitFactories(config *FactoryOpts) error {
 
 		// Software-Based BCCSP
 		if config.SwOpts != nil {
-			f := &SWFactory{}
+			// update by MinusZero
+			//f := &SWFactory{}
+			var f BCCSPFactory
+			if strings.ToUpper(config.ProviderName) == "GM" {
+				f = &GMFactory{}
+			} else {
+				f = &SWFactory{}
+			}
 			err := initBCCSP(f, config)
 			if err != nil {
 				factoriesInitError = errors.Wrapf(err, "Failed initializing BCCSP.")
@@ -85,6 +94,9 @@ func GetBCCSPFromOpts(config *FactoryOpts) (bccsp.BCCSP, error) {
 	switch config.ProviderName {
 	case "SW":
 		f = &SWFactory{}
+		// update by MinusZero
+	case "GM":
+		f = &GMFactory{}
 	case "PLUGIN":
 		f = &PluginFactory{}
 	default:

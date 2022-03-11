@@ -1,3 +1,4 @@
+//go:build pkcs11
 // +build pkcs11
 
 /*
@@ -49,10 +50,12 @@ func setFactories(config *FactoryOpts) error {
 		config = GetDefaultOpts()
 	}
 
-	if config.ProviderName == "" {
-		config.ProviderName = "SW"
-	}
-
+	// update by MinusZero
+	//if config.ProviderName == "" {
+	//	config.ProviderName = "SW"
+	//}
+	//暂时由GM替代bccsp
+	config.ProviderName = "GM"
 	if config.SwOpts == nil {
 		config.SwOpts = GetDefaultOpts().SwOpts
 	}
@@ -62,7 +65,14 @@ func setFactories(config *FactoryOpts) error {
 
 	// Software-Based BCCSP
 	if config.SwOpts != nil {
-		f := &SWFactory{}
+		// update by MinusZero
+		//f := &SWFactory{}
+		var f BCCSPFactory
+		if strings.ToUpper(config.ProviderName) == "GM" {
+			f = &GMFactory{}
+		} else {
+			f = &SWFactory{}
+		}
 		err := initBCCSP(f, config)
 		if err != nil {
 			factoriesInitError = errors.Wrap(err, "Failed initializing SW.BCCSP")
@@ -102,6 +112,9 @@ func GetBCCSPFromOpts(config *FactoryOpts) (bccsp.BCCSP, error) {
 	switch config.ProviderName {
 	case "SW":
 		f = &SWFactory{}
+		// update by MinusZero
+	case "GM":
+		f = &GMFactory{}
 	case "PKCS11":
 		f = &PKCS11Factory{}
 	case "PLUGIN":

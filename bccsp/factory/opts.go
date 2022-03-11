@@ -19,9 +19,13 @@ package factory
 // returns a new instance every time
 func GetDefaultOpts() *FactoryOpts {
 	return &FactoryOpts{
-		ProviderName: "SW",
+		// update by MinusZero
+		//ProviderName: "SW",
+		ProviderName: "GM",
 		SwOpts: &SwOpts{
-			HashFamily: "SHA2",
+			// update by MinusZero
+			//HashFamily: "SHA2",
+			HashFamily: "GMSM3",
 			SecLevel:   256,
 
 			Ephemeral: true,
